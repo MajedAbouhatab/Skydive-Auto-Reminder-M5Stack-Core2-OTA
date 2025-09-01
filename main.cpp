@@ -58,10 +58,15 @@ void setup(void)
   M5.Speaker.tone(0, 0);
   LCDText("Connecting\n\nto Wi-Fi...", GREEN, 0, 10, 4);
   FastLED.addLeds<SK6812, 25, BGR>(NULL, 10);
-  FastLED.setBrightness(25);
+  FastLED.setBrightness(100);
   FastLED.showColor(RED);
   WiFi.mode(WIFI_STA);
   WiFiManager wm;
+  if (M5.BtnB.isPressed())
+  {
+    wm.resetSettings();
+    ESP.restart();
+  }
   // Auto-exit after 30 seconds if no connection
   wm.setConfigPortalTimeout(30);
   M5.Display.printf("\n\n%s", wm.getWiFiSSID().c_str());
@@ -163,7 +168,10 @@ void setup(void)
                   // Minutes only
                   M = ((S2 - S1) / 60) % 60;
                   char TextBuffer[64];
-                  sprintf(TextBuffer, "%s\n%s\n%02d:%02d", Load["plane"].as<String>().c_str(), Load["loadNumber"].as<String>().c_str(), M, (S2 - S1) - M * 60);
+                  if ((S2 - S1) >= 0)
+                    sprintf(TextBuffer, "%s\n%s\n%02d:%02d", Load["plane"].as<String>().c_str(), Load["loadNumber"].as<String>().c_str(), M, (S2 - S1) - M * 60);
+                  else
+                    sprintf(TextBuffer, "%s\n%s\nHOLD", Load["plane"].as<String>().c_str(), Load["loadNumber"].as<String>().c_str());
                   M5.Lcd.fillRect(0, 0, 320, 200, BLACK);
                   LCDText(TextBuffer, GREEN, 0, 10, 4);
                   M5.delay(1000);
